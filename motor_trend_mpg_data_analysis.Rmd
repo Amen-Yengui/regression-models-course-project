@@ -1,119 +1,179 @@
 ---
-title: "Motor Trend MPG Data Analysis"
+title: "Coursera Regression Models Project"
 author: "Ameni Yengui"
-date: "Mai 07, 2020"
-output: html_document
+date: "07 mai 2020"
+output: word_document
 ---
-*Created with knitr*
+Motor Trend: Vehicle Fuel Consumption
+=====================================
 
-#### Executive Summary
-This report analyzed the relationship between transmission type (manual or 
-automatic) and miles per gallon (MPG). The report set out to determine which 
-transmission type produces a higher MPG. The `mtcars` dataset was used for this
-analysis. A t-test between automatic and manual transmission vehicles shows that
-manual transmission vehicles have a 7.245 greater MPG than automatic 
-transmission vehicles. After fitting multiple linear regressions, analysis 
-showed that the manual transmission contributed less significantly to MPG, only
-an improvement of 1.81 MPG.  Other variables, weight, horsepower, and number of 
-cylinders contributed more significantly to the overall MPG of vehicles.
+[GitHub Project Link:  ]<https://github.com/Amen-Yengui/regression-models-course-project>
 
-#### Load Data
-Load the dataset and convert categorical variables to factors.
-```{r results='hide', message=FALSE}
-library(ggplot2)
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## 1-Executive Summary
+
+In this project we will explore some features that affect fuel consumption in miles per gallon (MPG) answering some questions about automatic and manual transmissions (am).
+
+We are looking a dataset of a collection of cars (mtcars -  Motor Trend Car Road Tests), and are interested in exploring the relationship between a set of variables and Miles Per Gallon (MPG).
+
+In particularly we want answer two questions:
+
+- Is an automatic or manual transmission better for MPG?
+- Quantifying how different is the MPG between automatic and manual transmissions?
+
+## 2-Describing the Data
+The data of this project are extracted from the 1974 Motor Trend US magazine, and comprises fuel consumption and 10 aspects of automobile design and performance for 32 automobiles (1973/74 models).
+
+The data consists of 32 observations on 11 variables.
+
+- **mpg**:	 Miles/(US) gallon
+- **cyl**:	 Number of cylinders
+- **disp**:	 Displacement (cu.in.)
+- **hp**:	 Gross horsepower
+- **drat**:	 Rear axle ratio
+- **wt**:	 Weight (lb/1000)
+- **qsec**:	 1/4 mile time
+- **vs**:	 V/S
+- **am**:	 Transmission (0 = automatic, 1 = manual)
+- **gear**:	 Number of forward gears
+- **carb**:	 Number of carburetors
+
+## 3-Data Loading
+
+```{r, echo=TRUE}
+library(datasets)
 data(mtcars)
-head(mtcars, n=3)
-dim(mtcars)
-mtcars$cyl <- as.factor(mtcars$cyl)
-mtcars$vs <- as.factor(mtcars$vs)
-mtcars$am <- factor(mtcars$am)
-mtcars$gear <- factor(mtcars$gear)
-mtcars$carb <- factor(mtcars$carb)
-attach(mtcars)
 ```
 
-#### Exploratory Analysis
-**See Appendix Figure I** Exploratory Box graph that compares Automatic and Manual 
-transmission MPG. The graph leads us to believe that there is a significant 
-increase in MPG when for vehicles with a manual transmission vs automatic.
+## 4-Factor Data (wrangling)
 
-##### Statistical Inference
-T-Test transmission type and MPG
+Lets coerce the "cyl", "vs", "gear", "carb" and "am" variables into factor variables:
+```{r, echo=TRUE}
+mtcars$cyl <- as.factor(mtcars$cyl); mtcars$vs <- as.factor(mtcars$vs)
+mtcars$gear <- as.factor(mtcars$gear); mtcars$carb <- as.factor(mtcars$carb)
+mtcars$am <- as.factor(mtcars$am)
+```
+
+To better understanding will resume am levels to "Auto" and "Manual"
 ```{r}
-testResults <- t.test(mpg ~ am)
-testResults$p.value
+levels(mtcars$am) <- c("Auto", "Manual")
 ```
-The T-Test rejects the null hypothesis that the difference between transmission
-types is 0.  
+
+## 5-Preliminary EDA
+
+Lets look at dimension, structure and head of mtcars after the coersion.
 ```{r}
-testResults$estimate
-```
-The difference estimate between the 2 transmissions is 7.24494 MPG in favor of 
-manual.
-
-##### Regression Analysis
-Fit the full model of the data
-```{r results='hide'}
-fullModelFit <- lm(mpg ~ ., data = mtcars)
-summary(fullModelFit)  # results hidden
-summary(fullModelFit)$coeff  # results hidden
-```
-Since none of the coefficients have a p-value less than 0.05 we cannot conclude
-which variables are more statistically significant. 
-
-Backward selection to determine which variables are most statistically 
-significant
-```{r results='hide'}
-stepFit <- step(fullModelFit)
-summary(stepFit) # results hidden
-summary(stepFit)$coeff # results hidden
+dim(mtcars)  ## 32 observations and 11 variables
+head(mtcars) ## some observations to better understand mtcars 
+str(mtcars) ## variable types after coersion
 ```
 
-The new model has 4 variables (cylinders, horsepower, weight, transmission). The
-R-squared value of 0.8659 confirms that this model explains about 87% of the 
-variance in MPG. The p-values also are statistically significantly because they
-have a p-value less than 0.05. The coefficients conclude that increasing the 
-number of cylinders from 4 to 6 with decrease the MPG by 3.03.  Further 
-increasing the cylinders to 8 with decrease the MPG by 2.16.  Increasing the 
-horsepower is decreases MPG 3.21 for every 100 horsepower.  Weight decreases the
-MPG by 2.5 for each 1000 lbs increase. A Manual transmission improves the MPG by
-1.81.
+To answer our questions we are interested initially in the relation of two parameters that are Transmission (am) and Miles per Gallon (MPG). 
 
-#### Residuals & Diagnostics
-Residual Plot
-**See Appendix Figure II**
+Lets plotting this relation, to evaluate it (GRAPHIC FIGURE 1 AT APPENDIX).
 
-The plots conclude:
+```{r,echo=TRUE}
+## PLEASE, REFERS TO GRAPHIC FIGURE 1 AT APPENDIX
+```
 
-1. The randomness of the Residuals vs. Fitted plot supports the assumption of
-independence
-2. The points of the Normal Q-Q plot following closely to the line conclude that
-the distribution of residuals is normal
-3. The Scale-Location plot random distribution confirms the constant variance 
-assumption
-4. Since all points are within the 0.05 lines, the Residuals vs. Leverage 
-concludes that there are no outliers
+The plot show that manual transmissions have higher MPG's, but may have other variables that can play other role in determination of MPG, as `cyl`, `disp`, `hp`, `wt` and others. For example, it is common sense that the heavier the car, more likely he will fuel consumption.
+
+Lets plot MPG with other variables to identify correlations (GRAPHIC FIGURE 2 AT APPENDIX)
+
+```{r,echo=TRUE}
+## PLEASE, REFERS TO GRAPHIC FIGURE 2 AT APPENDIX
+```
+
+The graph shows that MPG has correlations with other variables than just `am`. 
+To obtain a more accurate model, we need predicting MPG in correlation with other variables than `am`. 
+Lets use some models to evaluate the correlations. 
+
+## 6-Models of Regression Analysis
+
+Lets run some tests to compare the MPG with correlate variables.
+
+### (a) Simple Linear Regression Model 
+Below is the model to explain the MPG variability only with the transmission type (am).
+```{r,echo=TRUE}
+fit1 <- lm(mpg ~ am, mtcars)
+summary(fit1)
+```
+
+The p-value are low (0.000285) and R-Squared is 0.3385. 
+Before making any conclusions on the effect of transmission type on fuel efficiency, we look at the variances between several variables in the dataset.
+
+Lets fitting all parameters of mtcars. 
+
+```{r, echo=TRUE}
+fitall <- lm(mpg ~ ., mtcars)
+summary(fitall)
+```
+
+Reading data, there is no coefficient significant at 0.05 level. R-Squared value has improved, but is not able to describe the remaining variance of the MPG variable and  p-value show any significance anymore. We have to meet somewhete in the middle.
+
+Lets use the R function STEP to do the variable selection.
+
+### (b) STEP function
+
 ```{r}
-sum((abs(dfbetas(stepFit)))>1)
+bestFit <- step(fitall,direction="both",trace=FALSE)
+summary(bestFit)
 ```
 
-#### Conclusion
-There is a difference in MPG based on transmission type. A manual transmission
-will have a slight MPG boost. However, it seems that weight, horsepower, & 
-number of cylinders are more statistically significant when determining MPG.
+The Residual standard error of this model is 2.41 on 26 degrees of freedom. 
+The Adjusted R-Squared value has increased to 0.8401 and the coefficients are significant at 0.05 significant level.
 
-### Appendix Figures
+### (d) Final Model Examination
 
-#### I
-```{r echo=FALSE}
-  boxplot(mpg ~ am, 
-          xlab="Transmission Type (0 = Automatic, 1 = Manual)", 
-          ylab="MPG",
-          main="MPG by Transmission Type")
+Now we fit the model "mpg ~ wt + qsec + am" as final examination model.
+
+```{r}
+lastModel <- lm(mpg ~ wt + qsec + am, data = mtcars)
+summary(lastModel)$coef
 ```
 
-#### II
-```{r echo=FALSE}
+
+### (e) Residual Analisys
+
+The resulting final model examination is dependant on the transmission (am), but also weight (wt) and 1/4 mile time (qsec). All have significant p-values and the R-squared is pretty good to (0.85)
+
+Now let's look (amongst others) at the Residuals vs Fitted (GRAPHIC FIGURE 3 AT APPENDIX).
+
+```{r}
+# PLEASE, REFERS TO GRAPHIC FIGURE 3 AT APPENDIX
+```
+The Normal Q-Q plot (GRAPHIC FIGURE 3 AT APPENDIX) show that residuals are normally distributed (points close to line). Scale-Location plot shows a constant variance due to a constant band pattern. Residuals and Leverage shows that most of the points are contained in the 0.5 bands
+
+## 7 - CONCLUSION
+
+All modes show that manual transmission will increase MPG, and this answer the first question (Is an automatic or manual transmission better for MPG?). Based on var lastModel using `mpg ~ wt + qsec + am` it is possible to conclude that manual transmission have more miles per gallon than automatic transmissions. With a `p < 0.05` confidence cars with manual transmission have near 3 more miles per gallon than automatic transmissions.
+
+If we have more observations available, with same cars model, using manual and automatic transmission, could help us better answer the second question about: Quantify the MPG difference between automatica and manual transmissions? The database with only 32 observations may not have been enough to answer more clearly the second question.
+
+# APPENDIX - GRAPHICS
+
+### Figure 1 : Boxplots of "mpg" versus "am"
+
+```{r,echo=TRUE}
+## GRAPHIC FIGURE 1
+plot(mpg ~ am, data = mtcars, main = "MPG BY TRANSMISSION TYPE (AM)", xlab = "Transmission Type (AM)", ylab = "Miles Per Gallon (MPG)")
+```
+
+### Figure 2 : Pairs graph
+
+```{r, fig.width = 10, fig.height = 10}
+## GRAPHIC FIGURE 2
+pairs(mtcars, panel = panel.smooth, main = "MTCARS PAIRS GRAPHS")
+```
+
+### Figure 3 : Residual plots
+
+```{r, echo=TRUE}
+# GRAPHIC FIGURE 3
 par(mfrow = c(2, 2))
-plot(stepFit)
+plot(lastModel)
 ```
+
